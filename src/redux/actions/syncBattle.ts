@@ -1154,13 +1154,16 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         return activeIndex;
       }
 
-      if (activePokemon && __DEV__) {
+      // only warn if this is the authenticated player's Pokemon
+      // (opponent Pokemon in FFA or other scenarios may legitimately have undefined activeId)
+      if (activePokemon && __DEV__ && playerKey === battleState.authPlayerKey) {
         l.warn(
           ...(activeId && processedIds.includes(activeId) ? [
             'Attempted to add existing activeId', activeId, 'for player', playerKey,
             '\n', 'processedIds', processedIds,
           ] : [
             'Could not find activeIndex with activeId', activeId, 'for player', playerKey,
+            '\n', 'This may indicate a sync issue with the authenticated player\'s Pokemon.',
           ]),
           '\n', 'active', '(client)', activePokemon,
           '\n', 'player', '(battle)', player,
